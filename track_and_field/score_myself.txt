@@ -1,0 +1,4 @@
+if I am asked to score all my body part, from head, back-arm, fore-arm, chest, abs, thigh, to calves, it would be:
+
+
+{'head': 9.5, 'back-arm': 9.5, 'fore-arm': 9.6, 'chest': 9.5, 'abs': 9.8, 'thigh': 8.0, 'calves': 8.0}
