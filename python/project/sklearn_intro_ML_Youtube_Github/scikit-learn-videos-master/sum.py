@@ -31,7 +31,50 @@ from sklearn.metrics import accuracy_score
 # 3 Steps: a) split b)train on training se c) test on testing set
 # import train/test split from sklearn
 from sklearn.model_selection import train_test_split
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 4)
+# My Codes(read data)
+from sklearn.datasets import load_iris
+iris = load_iris()
+X=iris.data
+y=iris.target
+# Use train test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 4)
 # train(fit) with training set...
 # test(accuracy_score) with testing set...
+# try K=1 through K=25 and record testing accuracy
+k_range = list(range(1, 26))
+scores = []
+for k in k_range:
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train, y_train)
+    y_pred = knn.predict(X_test)
+    scores.append(accuracy_score(y_test, y_pred))
+want=input('Do you wannna print accuracy score for k=1 to 25 knn? Type "yes" or Enter to continue: ')
+if want == 'yes':
+    from pandas import Series
+    s=Series(scores)
+    print('accurarcy score is: ', s)
+####################
+# sec 6
+import pandas as pd
+from pandas import read_csv
+data = read_csv('data/Advertising.csv', index_col = 0)# first column as index
+data.head()
+# data.tail()
+data.shape
+import seaborn as sns
+sns.pairplot(data, x_vars=['TV','Radio','Newspaper'], y_vars='Sales')
+feature_cols = ['TV', 'Radio', 'Newspaper']
+X = data[feature_cols]
+y = data['Sales']
+true = [100, 50, 30, 20]
+pred = [90, 50, 50, 30]
+from sklearn import metrics
+print(metrics.mean_absolute_error(true, pred))
+print(metrics.mean_squared_error(true, pred))
+import numpy as np
+print(np.sqrt(metrics.mean_squared_error(true, pred)))
+
+
+
+	
 
