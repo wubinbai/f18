@@ -22,4 +22,16 @@ knn = KNeighborsClassifier(n_neighbors=1)
 logreg = LogisticRegression()
 ####################
 # sec 5
-# 
+# metrics
+from sklearn.metrics import accuracy_score
+# to use it:
+# accuracy_score(y_true,y_pred)
+# problem: e.g. train and test on the same data with knn has problem of overfitting, since it fits very well on known data, too complex model that cannot generalize to out-of-sample data.
+# resolution: split data(train/test split)
+# 3 Steps: a) split b)train on training se c) test on testing set
+# import train/test split from sklearn
+from sklearn.model_selection import train_test_split
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.4, random_state = 4)
+# train(fit) with training set...
+# test(accuracy_score) with testing set...
+
