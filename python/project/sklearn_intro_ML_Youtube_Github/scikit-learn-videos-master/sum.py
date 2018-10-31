@@ -73,6 +73,29 @@ print(metrics.mean_absolute_error(true, pred))
 print(metrics.mean_squared_error(true, pred))
 import numpy as np
 print(np.sqrt(metrics.mean_squared_error(true, pred)))
+####################
+# sec 7
+from sklearn.model_selection import KFold
+kf = KFold(n_splits=5, shuffle=False).split(range(25))
+print('{} {:^61} {}'.format('Iteration', 'Training set observations', 'Testing set observations'))
+for iteration, data in enumerate(kf, start=1):
+    print('{:^9} {} {:^25}'.format(iteration, data[0], str(data[1])))
+from sklearn.model_selection import cross_val_score
+knn = KNeighborsClassifier(n_neighbors=5)
+scores = cross_val_score(knn, X, y, cv=10, scoring='accuracy')
+print(scores)
+print(scores.mean())
+k_range = list(range(1, 31
+))
+k_scores = []
+
+for k in k_range:
+    knn = KNeighborsClassifier(n_neighbors=k)
+    scores = cross_val_score(knn, X, y, cv=10, scoring='accuracy')
+    k_scores.append(scores.mean())
+print(k_scores)
+# cross validation with logistic regression score
+print(cross_val_score(logreg, X, y, cv=10, scoring='accuracy').mean())
 
 
 
