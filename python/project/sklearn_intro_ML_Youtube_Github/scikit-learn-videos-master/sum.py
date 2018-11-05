@@ -15,13 +15,12 @@
 # sec 4
 # knn: choose k, find k nearest, predict
 # Paradigm: 4 steps: import, instantiate, train(fit), predict
+####################
 # sec 5
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 knn = KNeighborsClassifier(n_neighbors=1)
 logreg = LogisticRegression()
-####################
-# sec 5
 # metrics
 from sklearn.metrics import accuracy_score
 # to use it:
