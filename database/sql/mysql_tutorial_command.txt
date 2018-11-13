@@ -1,6 +1,13 @@
 CREATE DATABASE tutorial_database;
 DROP DATABASE tutorial_database;
 SELECT database();
-  CREATE DATABASE tutorial_database;
+CREATE DATABASE tutorial_database;
 SHOW databases;
 USE tutorial_database;
+# on linux command
+sudo mysqldump tutorial_database > tutorial_database.sql;
+cp tutorial_database.sql tutorial_database_copy.sql
+# restore
+sudo mysql tutorial_database_copy < tutorial_database_copy.sql 
+
+
