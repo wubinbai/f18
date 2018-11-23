@@ -31,8 +31,11 @@ for i in range(8):
 # define func1 to func8
 
 def func1():
+    '''func1: drop Ticket & Cabin'''
     global train_df
     global test_df
+    global combine
+
     train_df=train_df.drop('Ticket',axis = 1)
     test_df=test_df.drop('Ticket', axis = 1)
     train_df=train_df.drop('Cabin',axis = 1)
@@ -40,30 +43,123 @@ def func1():
     combine=[train_df,test_df]
 
 def func2():
+    '''func2: drop PassengerId & Name'''
     global train_df
     global test_df
+    global combine
+   
     train_df=train_df.drop('PassengerId',axis = 1)
     test_df=test_df.drop('PassengerId', axis = 1)
     train_df=train_df.drop('Name',axis = 1)
     test_df=test_df.drop('Name', axis = 1)
+    combine=[train_df,test_df]
+
 
 def func3():
+    '''func3: Sex: male 0; female 1'''
     global train_df
     global test_df
-    for i in range(len(train_df.Sex)):
-        if train_df.Sex[i] == 'male':
-            train_df.Sex[i] = 0
-        else:
-            train_df.Sex[i] = 1
-     for i in range(len(test_df.Sex)):
-        if test_df.Sex[i] == 'male':
-            test_df.Sex[i] = 0
-        else:
-            test_df.Sex[i] = 1
-    #train_df.Sex
+    global combine
+    
+    mapping = {'male':0,'female':1}
+    train_df['Sex'] = train_df['Sex'].map(mapping).astype(int)
+    test_df['Sex'] = test_df['Sex'].map(mapping).astype(int)
+    combine=[train_df,test_df]
+
+   
+def func4():
+    '''func4: fill NaN for age with median for both train and test data  and divide age into 5 categories 0-4, with 16-year increment'''
+    global train_df
+    global test_df
+    global combine
+
+    train_df['Age'].fillna(train_df['Age'].dropna().median(), inplace = True)
+    test_df['Age'].fillna(test_df['Age'].dropna().median(), inplace = True)
+    for i in combine:
+        i.loc[i['Age'] <= 16,'Age'] = 0
+        i.loc[(i['Age'] > 16) & (i['Age'] <= 32),'Age'] = 1
+        i.loc[(i['Age'] > 32) & (i['Age'] <= 48),'Age'] = 2
+        i.loc[(i['Age'] > 48) & (i['Age'] <= 64),'Age'] = 3
+        i.loc[(i['Age'] > 64),'Age'] = 4
+
+
+def func5():
+    '''Create FamilySize from SibSp and Parch then create IsAlone'''
+    global train_df
+    global test_df
+    global combine
+
+    for i in combine:
+        i['FamilySize'] = i['SibSp'] + i['Parch'] + 1
+    for i in combine:
+        i['IsAlone'] = 0
+        i.loc[i['FamilySize']==1,'IsAlone'] = 1
+    train_df=train_df.drop(['Parch', 'SibSp','FamilySize'], axis = 1)
+    test_df=test_df.drop(['Parch', 'SibSp','FamilySize'], axis = 1)
+    combine = [train_df,test_df]
+
+def func6():
+    '''Create Age*Class'''
+    global train_df
+    global test_df
+    global combine
+
+    for i in combine:
+        i['Age*Class'] = i.Age * i.Pclass
+
+def func7():
+    '''fill NaN for missing data in train data's Embarked with mode, then convert to 0 1 2'''
+    global train_df
+    global test_df
+    global combine
+
+    for i in combine:
+        i['Embarked'] = i['Embarked'].fillna(train_df.Embarked.dropna().mode()[0])# since only train data's Embarked has nan
+        i['Embarked'] = i['Embarked'].map({'S':0,'C':1,'Q':2}).astype(int)
+
+
+def func8():
+    '''fill with median for one missing in test data's Fare, then catogorize into 4 section with 0-3'''
+    global train_df
+    global test_df
+    global combine
+
+    test_df['Fare'].fillna(test_df['Fare'].dropna().median(), inplace = True)
+    for i in combine:
+        i.loc[i['Fare'] <= 7.91,'Fare'] = 0
+        i.loc[(i['Fare'] > 7.91) & (i['Fare'] <= 14.454),'Fare'] = 1
+        i.loc[(i['Fare'] > 14.454) & (i['Fare'] <= 31),'Fare'] = 2
+        i.loc[(i['Fare'] > 31),'Fare'] = 3
+        combine = [train_df, test_df]
+
+
 
 func1()
 func2()
 func3()
+func4()
+func5()
+func6()
+func7()
+func8()
+
 train_df.shape
-test_df.shape
+train_df.Sex.head()
+
+'''
+# Step 2: use data
+# overall:
+X_train = train_df.drop("Survived", axis = 1)
+y_train = train_df["Survived"]
+X_test = test_d
+# ML models: LR, SVM, kNN, GNB, Perceptron, Linear SVC, SGD, DT, RF
+
+# 1 LR
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+y_pred = logreg.predict(X_test)
+acc_log = round(logreg.score(x_train, y_train)*100,2)
+
+# SVM
+'''
+print(train_df.shape,test_df.shape,train_df.info(),test_df.info())
