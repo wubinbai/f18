@@ -13,21 +13,29 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
+# my import
+# from sklearn.metrics import accuracy_score
 
 # Step 1: Import and Modify data
 
 train_df=pd.read_csv('train.csv')
 test_df=pd.read_csv('test.csv')
 combine=[train_df,test_df]
+PassengerId_Series = test_df["PassengerId"]
+
+'''
 columns=train_df.columns
 columns
 columns_list=list(columns)
 columns_list
+'''
+
+'''
 d=dict()
 func_list=['Ticket, Cabin','Name, PassengerId','Sex','Age','SibSp, Parch','Age*Class','Embarked','Fare']
 for i in range(8):
     d['func'+'{}'.format(i+1)]=func_list[i]
-
+'''
 # define func1 to func8
 
 def func1():
@@ -130,7 +138,8 @@ def func8():
         i.loc[(i['Fare'] > 7.91) & (i['Fare'] <= 14.454),'Fare'] = 1
         i.loc[(i['Fare'] > 14.454) & (i['Fare'] <= 31),'Fare'] = 2
         i.loc[(i['Fare'] > 31),'Fare'] = 3
-        combine = [train_df, test_df]
+    
+    combine = [train_df, test_df]
 
 
 
@@ -143,23 +152,76 @@ func6()
 func7()
 func8()
 
-train_df.shape
-train_df.Sex.head()
 
-'''
+
 # Step 2: use data
 # overall:
 X_train = train_df.drop("Survived", axis = 1)
 y_train = train_df["Survived"]
-X_test = test_d
+X_test = test_df
 # ML models: LR, SVM, kNN, GNB, Perceptron, Linear SVC, SGD, DT, RF
 
 # 1 LR
 logreg = LogisticRegression()
 logreg.fit(X_train, y_train)
 y_pred = logreg.predict(X_test)
-acc_log = round(logreg.score(x_train, y_train)*100,2)
+acc_log = round(logreg.score(X_train, y_train)*100,2)
 
-# SVM
-'''
+
+# 2 SVM
+svc = SVC()
+svc.fit(X_train, y_train)
+y_pred = svc.predict(X_test)
+acc_svc = round(svc.score(X_train, y_train)*100,2)
+
+# 3 kNN
+knn = KNeighborsClassifier(n_neighbors = 3)
+knn.fit(X_train, y_train)
+y_pred = knn.predict(X_test)
+acc_knn = round(knn.score(X_train, y_train)*100,2)
+
+
+# 4 GNB
+gau = GaussianNB()
+gau.fit(X_train, y_train)
+y_pred = gau.predict(X_test)
+acc_gau = round(gau.score(X_train, y_train)*100,2)
+
+
+# 5 Perceptron
+perc = Perceptron()
+perc.fit(X_train, y_train)
+y_pred = perc.predict(X_test)
+acc_perc = round(perc.score(X_train, y_train)*100,2)
+
+
+# 6 Linear SVC
+linear_svc = LinearSVC()
+linear_svc.fit(X_train, y_train)
+y_pred = linear_svc.predict(X_test)
+acc_linear_svc = round(linear_svc.score(X_train, y_train)*100,2)
+
+# 7 SGD
+sgd = SGDClassifier()
+sgd.fit(X_train, y_train)
+y_pred = sgd.predict(X_test)
+acc_sgd = round(sgd.score(X_train, y_train)*100,2)
+
+# 8 DT
+dt = DecisionTreeClassifier()
+dt.fit(X_train, y_train)
+y_pred = dt.predict(X_test)
+acc_dt = round(dt.score(X_train, y_train)*100,2)
+y_pred_dt = y_pred
+sub = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_dt})
+sub.to_csv('sub_data_sci.csv', index = False)
+
+# 9 RF
+tf = RandomForestClassifier(n_estimators = 100)
+tf.fit(X_train, y_train)
+y_pred = tf.predict(X_test)
+acc_tf = round(tf.score(X_train, y_train)*100,2)
+
+
+
 print(train_df.shape,test_df.shape,train_df.info(),test_df.info())
