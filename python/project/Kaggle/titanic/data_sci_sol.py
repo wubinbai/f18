@@ -166,6 +166,10 @@ logreg = LogisticRegression()
 logreg.fit(X_train, y_train)
 y_pred = logreg.predict(X_test)
 acc_log = round(logreg.score(X_train, y_train)*100,2)
+y_pred_lr = y_pred
+sub_lr = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_lr})
+sub_lr.to_csv('sub_lr.csv', index = False)
+
 
 
 # 2 SVM
@@ -173,12 +177,20 @@ svc = SVC()
 svc.fit(X_train, y_train)
 y_pred = svc.predict(X_test)
 acc_svc = round(svc.score(X_train, y_train)*100,2)
+y_pred_svc = y_pred
+sub_svc = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_svc})
+sub_svc.to_csv('sub_svc.csv', index = False)
+
 
 # 3 kNN
 knn = KNeighborsClassifier(n_neighbors = 3)
 knn.fit(X_train, y_train)
 y_pred = knn.predict(X_test)
 acc_knn = round(knn.score(X_train, y_train)*100,2)
+y_pred_knn = y_pred
+sub_knn = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_knn})
+sub_knn.to_csv('sub_knn.csv', index = False)
+
 
 
 # 4 GNB
@@ -186,6 +198,10 @@ gau = GaussianNB()
 gau.fit(X_train, y_train)
 y_pred = gau.predict(X_test)
 acc_gau = round(gau.score(X_train, y_train)*100,2)
+y_pred_gnb = y_pred
+sub_gnb = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_gnb})
+sub_gnb.to_csv('sub_gnb.csv', index = False)
+
 
 
 # 5 Perceptron
@@ -193,6 +209,10 @@ perc = Perceptron()
 perc.fit(X_train, y_train)
 y_pred = perc.predict(X_test)
 acc_perc = round(perc.score(X_train, y_train)*100,2)
+y_pred_perc = y_pred
+sub_perc = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_perc})
+sub_perc.to_csv('sub_perc.csv', index = False)
+
 
 
 # 6 Linear SVC
@@ -200,12 +220,21 @@ linear_svc = LinearSVC()
 linear_svc.fit(X_train, y_train)
 y_pred = linear_svc.predict(X_test)
 acc_linear_svc = round(linear_svc.score(X_train, y_train)*100,2)
+y_pred_lsvc = y_pred
+sub_lsvc = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_lsvc})
+sub_lsvc.to_csv('sub_lsvc.csv', index = False)
+
 
 # 7 SGD
 sgd = SGDClassifier()
 sgd.fit(X_train, y_train)
 y_pred = sgd.predict(X_test)
 acc_sgd = round(sgd.score(X_train, y_train)*100,2)
+y_pred_sgd = y_pred
+sub_sgd = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_sgd})
+sub_sgd.to_csv('sub_sgd.csv', index = False)
+
+
 
 # 8 DT
 dt = DecisionTreeClassifier()
@@ -213,14 +242,18 @@ dt.fit(X_train, y_train)
 y_pred = dt.predict(X_test)
 acc_dt = round(dt.score(X_train, y_train)*100,2)
 y_pred_dt = y_pred
-sub = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_dt})
-sub.to_csv('sub_data_sci.csv', index = False)
+sub_dt = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_dt})
+sub_dt.to_csv('sub_dt.csv', index = False)
 
 # 9 RF
-tf = RandomForestClassifier(n_estimators = 100)
-tf.fit(X_train, y_train)
-y_pred = tf.predict(X_test)
-acc_tf = round(tf.score(X_train, y_train)*100,2)
+rf = RandomForestClassifier(n_estimators = 100)
+rf.fit(X_train, y_train)
+y_pred = rf.predict(X_test)
+acc_rf = round(rf.score(X_train, y_train)*100,2)
+y_pred_rf = y_pred
+sub_rf = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_rf})
+sub_rf.to_csv('sub_rf.csv', index = False)
+
 
 
 
