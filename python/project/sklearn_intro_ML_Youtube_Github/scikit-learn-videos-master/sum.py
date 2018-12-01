@@ -57,6 +57,7 @@ if want == 'yes':
 import pandas as pd
 from pandas import read_csv
 data = read_csv('data/Advertising.csv', index_col = 0)# first column as index
+data_copy = data
 data.head()
 # data.tail()
 data.shape
