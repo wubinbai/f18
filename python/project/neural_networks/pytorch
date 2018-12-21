@@ -1,0 +1,108 @@
+PyTorch
+
+PyTorch, as the name suggests, is the Python version of the Torch framework. Torch was originally developed in C, with a wrapper using the Lua programming language. PyTorch is primarily developed by Facebook’s AI research group, and wraps around the Torch binaries with Python instead.
+
+A key feature in PyTorch is the ability to modify existing neural networks without having to rebuild it from scratch, using dynamic computation graphs. PyTorch describes it like using and replaying a tape recorder and it’s inspired by other works such as autograd and Chainer.
+
+In implementing the simple neural network, I didn’t have the chance to use this feature properly but it seems an interesting approach to building up a neural network that I’d like to explore more later.
+
+Let’s see how PyTorch works for our simple neural network.
+Set up parameters and load the dataset
+
+import torch
+import argparse
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.autograd import Variable
+
+# parameters
+inputs, hiddens, outputs = 784, 200, 10
+learning_rate = 0.01
+epochs = 50
+batch_size = 20
+
+transformation = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))])
+train_dataset = datasets.MNIST('mnist/',train=True,transform=transformation, download=False)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+test_dataset = datasets.MNIST('mnist/',train=False,transform=transformation, download=False)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
+
+Loading the datasets take a few steps, but they are rather straightforward. What’s interesting to note is that the transformation normalises with a mean of 0.1307 and standard deviation of 0.3081, which is the mean and standard deviation of the MNIST dataset.
+Define the neural network
+
+class mlp(nn.Module):
+    def __init__(self):
+        super(MLP, self).__init__()
+        self.sigmoid = nn.Sigmoid()
+        self.hidden_layer = nn.Linear(inputs, hiddens)
+        self.output_layer = nn.Linear(hiddens, outputs)
+
+    def forward(self, x):
+        out = self.sigmoid(self.hidden_layer(x))
+        out = self.sigmoid(self.output_layer(out))
+        return out
+
+    def name(self):
+        return "mlp"
+
+Defining the neural network is simple. We define some methods in the class, with sigmoid being nn.Sigmoid, hidden_layer and output_layer being linear layers with the appropriate sizes.
+
+The forward method then passes the input x into the hidden layer, and then to the sigmoid activation function. After that it goes into the output layer and again to the sigmoid activation function one more time before returning the output.
+Define the train function
+
+def train():
+    model = mlp()
+    loss = nn.MSELoss(size_average=False)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(epochs):
+        avg_error = 0
+        for i, (images, labels) in enumerate(train_loader):
+            images = Variable(images.view(-1, inputs))
+            # Convert class label to one hot vector 
+            one_hot = torch.FloatTensor(labels.size(0), 10).zero_()
+            target = one_hot.scatter_(1, labels.view((labels.size(0),1)), 1)            
+            target = Variable(target)
+            # Compute loss and gradient
+            optimizer.zero_grad()
+            out = model(images)
+            error = loss(out, target)
+            error.backward()
+            # Apply gradient
+            optimizer.step()
+            avg_error += error.data[0]
+
+        avg_error /= train_loader.dataset.train_data.shape[0]
+        print ('Epoch [%d/%d], error: %.4f' %(epoch+1, epochs, avg_error))
+    # Save model to file
+    torch.save(model.state_dict(), 'model.pkl')
+
+As with the other implementations, we first create the neural network model, the error function loss (which we defined to be a mean square error loss function) and also the Adam optimizer.
+
+We run the training for 50 epochs as usual. Because the training labels are not in the correct format, we need to convert it to a one-hot vector, target. Then we compute the error using the loss function, passing it the actual output values, as well as the target, then apply backpropagation to it.
+
+Finally we save the model before ending the training. There are a couple of ways to save a PyTorch model. The more generic Python way is to save it as a pickle file, with a .pkl extension. This is what I used in this implementation. An alternative is to use PyTorch’s own serialisation mechanism which saves into a file with a .pth extension.
+Define the predict function
+
+def predict():
+    model = mlp()
+    model.load_state_dict(torch.load('model.pkl'))
+    correct, total = 0, 0
+    for images, labels in test_loader:
+        images = Variable(images.view(-1, inputs))
+        out = model(images)
+        _, predicted = torch.max(out.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum()
+    print('accuracy: %0.2f %%' % (100.0 * correct / total))   
+
+Predicting is simpler than training. Here we need to first create a neural network and load it with the saved state to reproduce the trained model. Then using the trained model we predict the output and then check if it’s correct using the labels. Finally we total up all the correctly predicted values and get the percentage of accuracy.
+Training then predicting
+
+Here’s the results.
+
+
+Results
+
+As you can see, the network couldn’t converge properly within 50 epochs with the same learning rate. The prediction accuracy here is quite poor, only 95.17%. On the other hand when I switched over to using the SGD optimizer, the accuracy was better at 98.29%.
+

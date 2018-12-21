@@ -1,0 +1,213 @@
+The neural network had 3 layers, the first (input) layer has 784 neurons (28 x 28 pixels), the second (hidden) layer has 200 neurons and the final (output) layer has 10 neurons. I used the sigmoid function as the activation function, and also mean square error as the loss function. Finally, I used 0.1 as the learning rate and didn’t use any bias neurons at all.
+
+All the implementations below follow the same generic steps:
+
+    Set up the parameters and load the datasets (most frameworks have a means to load standard datasets like MNIST)
+    Define the neural network by creating a mlp function that creates and returns the neural network
+    Define the train function
+    Define the predict function
+    Create a main that allows the user to first train using the training dataset (60,000 images) then predict using the test dataset (10,000 images)
+
+This handwriting recognition of digits with the MNIST dataset is so often used in deep learning tutorials it’s almost the ‘hello world’ of writing deep learning programs. As a disclaimer though, the implementations you see below are not optimized in any way and are not the definitive way of doing it. In fact there are many other more optimal ways of doing it, these are just a few.
+
+Now let’s start and see how to implement this in TensorFlow first.
+TensorFlow
+
+TensorFlow was originally developed by researchers and engineers who worked on the Google Brain project for internal use, and open sourced in 2015. It’s the most popular deep learning framework to date by far.
+
+Amongst the more famous projects that are running on TensorFlow includes DeepMind (the Google-owned company that developed AlphaGo), which converted from Torch to TensorFlow in 2016.
+
+This implementation uses TensorFlow 1.6. Let’s start.
+Set up parameters and load the dataset
+import TensorFlow as tf
+import argparse
+import numpy as np
+from TensorFlow.examples.tutorials.mnist import input_data
+
+# parameters
+inputs, hiddens, outputs = 784, 200, 10
+learning_rate = 0.01
+epochs = 50
+batch_size = 20
+
+#loading the datasets
+mnist = input_data.read_data_sets("./mnist/", one_hot=True)
+The is rather simple and self explanatory. Note that we’re setting up the data output to be one-hot. This just means the position of the ndarray element with the highest value is the correct one.
+Define the neural network
+
+# a random generator using uniform
+def random(r, c, v):
+    return tf.random_uniform([r,c], minval=-1/tf.sqrt(float(v)), maxval=1/tf.sqrt(float(v)))
+
+# the neural network
+def mlp(x, hidden_weights=None, output_weights=None):
+    if hidden_weights == None:
+        hidden_weights = tf.Variable(random(inputs, hiddens, inputs), name="hidden_weights")
+    if output_weights == None:
+        output_weights = tf.Variable(random(hiddens, outputs, hiddens), name="output_weights")
+    hidden_outputs = tf.matmul(x, hidden_weights)
+    hidden_outputs = tf.nn.sigmoid(hidden_outputs)  
+    final_outputs = tf.matmul(hidden_outputs, output_weights)
+    final_outputs = tf.nn.sigmoid(final_outputs)
+    return final_outputs
+
+This is where we define the neural network. It’s relatively straightforward. If the hidden and output weights are not passed in, the weights are randomly generated using the tf.random_uniform function. This happens when we train the neural network.
+
+How a neuron works
+
+As in the previous neural network I created, we first multiply (using tf.matmul) the input x with the hidden weights to get the hidden outputs . Remember we’re working with matrices so tf.matmul is actually a dot product function and the hidden weights and the inputs are both matrices.
+
+The hidden outputs are then passed through an activation function, in this case a sigmoid function. The output is then multiplied with the output weight to get the final outputs.
+
+The final outputs are returned after they have been passed through a sigmoid activation function again.
+Define the train function
+
+# training with the train dataset
+def train(x, y):
+    final_outputs = mlp(x)
+    errors = tf.reduce_mean(tf.squared_difference(final_outputs, y))
+    optimiser = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(errors)
+    init_op = tf.global_variables_initializer()
+    saver = tf.train.Saver()
+    with tf.Session() as sess:
+        sess.run(init_op)
+        total_batch = int(len(mnist.train.labels) / batch_size)
+        for epoch in range(epochs):
+            avg_error = 0
+            for i in range(total_batch):
+                batch_x, batch_y = mnist.train.next_batch(batch_size=batch_size)
+                _, c = sess.run([optimiser, errors], feed_dict={x: batch_x, y: batch_y})
+                avg_error += c / total_batch
+            print("Epoch [%d/%d], error: %.4f" %(epoch+1, epochs, avg_error))
+        print("\nTraining complete!")
+        saver.save(sess, "./model")
+
+Let’s look at how we train our neural network model. First, we create it using the mlp function, passing it the inputs. We also define our error function aptly named error to be the squared difference between the target and the output (mean square error).
+
+Next, we define the optimizer, and we use the Adam optimizer here, passing it the learning rate and also our error function. When I first started dabbling with this, I used the gradient descent optimizer but the values take a very long time to converge. When when I switched over to the Adam optimizer it converged nicely so I used the Adam optimizer instead.
+
+Now that we have our optimizer, we initialise all the variables and define a saver so that we can save the model. We start a session and run the mini-batches by epochs, passing it the training dataset we loaded earlier on.
+
+Once we’re done with the training, we save the model. A TensorFlow model consists of two parts. The first is the meta graph, which saves information on the TensorFlow graph. This is saved into a file with a .meta extension, in this case, it will be model.meta.
+
+The second are a bunch of checkpoint files. The model.index stores a list of variable names and shapes, while the model.data-00000-of-00001 stores the actual values of the variables.
+
+We’ll be re-using these files later when we want to load the model for doing the prediction.
+Define the predict function
+
+# predicting with the test dataset
+def predict(x):    
+    saver = tf.train.import_meta_graph("./model.meta")
+    with tf.Session() as sess:
+        saver.restore(sess, tf.train.latest_checkpoint("./"))
+        graph = tf.get_default_graph()
+        hidden_weights = graph.get_tensor_by_name("hidden_weights:0")
+        output_weights = graph.get_tensor_by_name("output_weights:0")
+        final_outputs = mlp(x, hidden_weights, output_weights)       
+        correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(final_outputs, 1))
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        tf.summary.scalar('accuracy', accuracy)          
+        print(sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
+
+After we’ve trained the model we would want to have something that we can use for predicting the values. In this case what we actually want is to run our predict function over the 10,000 images in the test dataset and see how many of them our trained model gets correctly.
+
+We start off with importing the meta graph, which is from the model.meta file. Next we restore the checkpoint and use the default graph to get the hidden weights and output weights by their respective names.
+
+Finally we restore the trained model by calling the mlp function and passing it the saved weights.
+
+Armed with the trained model, we try to predict output as we pass in the test dataset, and get the accuracy of the model. The predict function prints out the accuracy of the prediction of all the test images.
+Training then predicting
+
+if __name__ == "__main__":
+    x = tf.placeholder(tf.float32, [None, inputs])
+    y = tf.placeholder(tf.float32, [None, outputs])       
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--action", type=str, default="predict" )
+    FLAGS, unparsed = parser.parse_known_args()
+    if FLAGS.action == "predict":
+        predict(x)
+    if FLAGS.action == "train":
+        train(x, y)
+
+The last bit is pretty trivial, it’s just a main function that allows the user to either predict or train according. This part is actually the same in the other implementations so I won’t be showing this code again later on.
+
+Here’s the results.
+
+Results
+
+The model predicts correctly 97.25% of the time, which is not too good but ok. Now let’s look at Keras next.
+Keras (on TensorFlow)
+
+Keras isn’t a separate framework but an interface built on top of TensorFlow, Theano and CNTK. Keras is designed for fast prototyping and being easy to use and user-friendly.
+
+In 2017, TensorFlow decided to support Keras in TensorFlow’s core library though nothing changed for Keras itself.
+
+Let’s see how things are different in Keras.
+Set up parameters and load the dataset
+
+import argparse
+from keras.models import Sequential
+from keras.datasets import mnist
+from keras.layers import Dense
+from keras.models import load_model
+from keras import optimizers
+from keras import utils
+
+# parameters
+inputs, hiddens, outputs = 784, 100, 10
+learning_rate = 0.01
+epochs = 50
+batch_size = 20
+
+# loading datasets
+(train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+train_images = train_images.reshape(60000, 784).astype('float32')/255
+train_labels = utils.to_categorical(train_labels, outputs)
+test_images = test_images.reshape(10000, 784).astype('float32')/255
+test_labels = utils.to_categorical(test_labels, outputs)
+
+Setting up the dataset seems a bit more elaborate than before but it’s not a big deal, in fact it’s clearer that we’re reshaping the train and test datasets to the correct shapes and sizes.
+Define the train function
+
+# training with the train dataset
+def train():
+    model = Sequential()
+    model.add(Dense(hiddens, activation='sigmoid', input_shape=(inputs,)))
+    model.add(Dense(outputs, activation='sigmoid'))
+    sgd = optimizers.Adam(lr=learning_rate)
+    model.compile(optimizer=sgd, loss='mean_squared_error')
+    model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs)
+    model.save('mlp_model.h5')
+
+You might notice that I didn’t define the neural network here. I could have created a separate mlp function to do that but it’s not really necessary because I used one of the built-in Keras models called Sequential and simply stacked layers on top of it to build the network.
+
+The first two lines added the hidden and output layers (the input later is assumed by default, given the input shape of the hidden layer). This includes the activation function sigmoid.
+
+We define the optimizer next, using optimizers.Adam which is the built-in Adam optimizer.
+
+The model is compiled with the optimizer, and assigned an error (or loss) function mean_squared_error which is also built-in.
+
+Finally we use the fit method to train the model using the images and labels, with the given batch size and number of epochs.
+
+As before, we save the model after training it.
+Define the predict function
+
+# predicting the test dataset
+def predict():
+    model = load_model("mlp_model.h5")
+    error = model.evaluate(test_images, test_labels)
+    print("accuracy:", 1 - error)
+
+If you think the training function was rather simple, check out the predict function! You simply need to load up the model, then use it to evaluate the test images and labels!
+Training then predicting
+
+Here’s what you see when training.
+
+Results - training
+
+And here’s the results when predicting.
+
+Results - predicting
+
+The accuracy here is much better, we have 99.42% accuracy in detecting the correct images.
+

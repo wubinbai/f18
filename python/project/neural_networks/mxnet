@@ -1,0 +1,112 @@
+MXNet with Gluon
+
+MXNet is an Apache Foundation project that’s currently being incubated in Apache. It has support in multiple languages and supported by a number of large industry players, prominently including Amazon and Microsoft.
+
+Amazon chose MXNet as a deep learning framework of choice because it claims that MXNet scales and runs better than other frameworks. MXNet models are portable and can be deployed on devices as well. In October 2017 Amazon and Microsoft launched a new interface for MXNet called Gluon, to make deep learning easier.
+
+Gluon is relatively easy to use and to build our simple neural network from my perspective it seems pretty much the same. Admittedly I probably haven’t used it to it’s best capabilities.
+
+Let’s see how it works.
+Set up parameters and load the dataset
+
+import argparse
+import numpy as np
+import mxnet as mx
+from mxnet import nd, autograd, gluon
+from mxnet.gluon import nn
+from mxnet.gluon.data import vision
+
+# parameters
+inputs, hiddens, outputs = 784, 200, 10
+learning_rate = 0.01
+epochs = 50
+batch_size = 20
+
+ctx = mx.cpu()
+
+def transform(data, label):
+    return data.astype(np.float32)/255, label.astype(np.float32)
+    
+train_data = mx.gluon.data.DataLoader(vision.MNIST(train=True, transform=transform), batch_size, shuffle=True)
+test_data = mx.gluon.data.DataLoader(vision.MNIST(train=False, transform=transform), batch_size, shuffle=False)
+
+Unlike other frameworks, you have to be more explicit where you want the context of operations are to be run on. In this case I’m running on the CPU only so I created a context ctx that is based on the CPU.
+
+Loading the datasets are not much different from the other frameworks.
+Define the neural network
+
+def mlp():
+    model = nn.Sequential()
+    with model.name_scope():
+        model.add(nn.Dense(hiddens, activation="sigmoid"))
+        model.add(nn.Dense(outputs, activation="sigmoid"))
+        dist = mx.init.Uniform(1/np.sqrt(float(inputs)))
+        model.collect_params().initialize(dist, ctx=ctx) 
+    return model
+
+Defining the neural network is relatively simple and quite similar to Keras. We simply use a built-in model add layers on it with the appropriate activation function then initialise it with the context and weights with random value sampled from a uniform distribution. I used the uniform distribution here to be consistent with the earlier implementations. I did try other distributions but the results are somewhat the same so at least in this post I am sticking to this distribution.
+Define the train function
+
+def train():
+    model = mlp()   
+    loss = gluon.loss.L2Loss()
+    optimizer = gluon.Trainer(model.collect_params(), "adam", {"learning_rate": learning_rate})
+
+    for e in range(epochs):
+        cumulative_error = 0
+        for i, (data, labels) in enumerate(train_data):
+            data = data.as_in_context(ctx).reshape((-1, inputs))
+            labels = nd.one_hot(labels, 10, 1, 0).as_in_context(ctx)
+            with autograd.record():
+                output = model(data)
+                error = loss(output, labels)
+            error.backward()
+            optimizer.step(data.shape[0])
+            cumulative_error += nd.sum(error).asscalar()
+        print("Epoch [%d/%d]: error: %.4f" % (e+1, epochs, cumulative_error/len(train_data)))    
+    model.save_params("mxnet.model")
+
+To train the model, we first create it with our mlp function. We define an error function loss using L2Loss which is essential a mean square error function.
+
+We also define an optimiser (called a Trainer in MXNet), which uses the Adam optimizer algorithm.
+
+Next we enumerate the train dataset and reshape into a one-hot ndarray. We pass the train dataset through the trained model to get an output. The output and labels are passed to the error function.
+
+After the training we save the network model. MXNet allows us to save the parameters with a simple save_params method. It’s not too particular about the file name so we can use any name we like.
+Define the predict function
+
+def predict():
+    model = mlp()
+    model.load_params("mxnet.model", ctx)
+    acc = mx.metric.Accuracy()
+    for i, (data, label) in enumerate(test_data):
+        data = data.as_in_context(ctx).reshape((-1, inputs))
+        label = label.as_in_context(ctx)
+        output = model(data)
+        predictions = nd.argmax(output, axis=1)
+        acc.update(preds=predictions, labels=label)
+    print("accuracy: %.2f %%" % (acc.get()[1] * 100))
+
+The predict function recreates our trained model by loading it from the file we saved earlier on. We reshape the data in the test dataset, and pass it through the loaded trained model and and we get the predictions as an output. Then using the labels we find the accuracy of the predictions.
+Training then predicting
+
+Here’s the result of the prediction using the MXNet framework with Gluon.
+
+Results
+
+The accuracy is 97.49% which is pretty much the same as the rest of the frameworks.
+Some thoughts
+
+Obviously this post doesn’t have all the deep learning frameworks. It’s more like a rambling walk through a few selected frameworks that piqued my fancy as I explored various frameworks. I missed out quite a number of popular ones including Caffe and Caffe2, CNTK, Theano, Torch, Sonnet and many many others.
+
+I didn’t do any comparisons either — that’s not the intention, any comparisons would require much deeper understanding of these frameworks and a lot more time. And in a sense since all these frameworks are growing (as I wrote this post over the past weeks, TensorFlow released 1.7 and 1.8 in a row!) and changing any comparisons would be inaccurate very quickly. Rather, my purpose was to figure out how easy it is to actually write deep learning software and how much these frameworks can help me do that.
+
+As I was using these frameworks I realised that they are largely the same in terms of what the goals are. In each framework, the goals are always to have an easy way to load the datasets, define a model, train that model then use it to predict the results. The way to achieve might be different from framework to framework and the underlying philosophies might differ but the goals remain the same.
+
+In a sense it’s very similar to all web frameworks that I’ve been using for the past 20 years. While amazing web applications have been created over the years, web frameworks have essentially worked about the same way, with the same views, controllers and services and working with HTTP.
+
+No doubt I’m entirely oversimplifying everything, but in a sense I’m comforted at the same time.
+Source code
+
+You can find all the source code here:
+
