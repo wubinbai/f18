@@ -4,7 +4,7 @@ import numpy as np
 # Assuming y = 0 + 10 * x1 + 20*x2
 # So theta0 = 0, theta1 = 10, theta2 = 20
 x1=[1,2,3,4,5]
-x2=[2,4,6,8,10]
+x2=[1.5,4,6,9,10.5]
 y=[]
 for i in range(len(x1)):
     y.append( 10 * x1[i] + 20 * x2[i])
