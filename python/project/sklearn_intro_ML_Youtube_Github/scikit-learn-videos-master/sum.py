@@ -56,6 +56,8 @@ if want == 'yes':
 # sec 6
 import pandas as pd
 from pandas import read_csv
+from pylab import *
+
 data = read_csv('data/Advertising.csv', index_col = 0)# first column as index
 data_copy = data
 data.head()
@@ -63,6 +65,9 @@ data.head()
 data.shape
 import seaborn as sns
 sns.pairplot(data, x_vars=['TV','Radio','Newspaper'], y_vars='Sales')
+ion()
+show()
+
 feature_cols = ['TV', 'Radio', 'Newspaper']
 X = data[feature_cols]
 y = data['Sales']
