@@ -20,6 +20,8 @@ from sklearn.tree import DecisionTreeClassifier
 
 train_df=pd.read_csv('train.csv')
 test_df=pd.read_csv('test.csv')
+train_df_copy = train_df
+test_df_copy = test_df
 combine=[train_df,test_df]
 PassengerId_Series = test_df["PassengerId"]
 
@@ -43,9 +45,10 @@ def func1():
     global train_df
     global test_df
     global combine
-
+    # Drop Ticket since by using train_df_copy.Ticket.describe() we know it's highly duplicated, with 681 unique, out of 891 in training set. More importantly, there may not be correlation between Ticket and Survived.
     train_df=train_df.drop('Ticket',axis = 1)
     test_df=test_df.drop('Ticket', axis = 1)
+    # Drop Cabin since it's highly incomplete/ contains too many null values. 204/891; 91/418.
     train_df=train_df.drop('Cabin',axis = 1)
     test_df=test_df.drop('Cabin', axis = 1)
     combine=[train_df,test_df]
@@ -55,9 +58,9 @@ def func2():
     global train_df
     global test_df
     global combine
-   
+    #For test_df, don not drop PassengerId yet.
     train_df=train_df.drop('PassengerId',axis = 1)
-    test_df=test_df.drop('PassengerId', axis = 1)
+    #test_df=test_df.drop('PassengerId', axis = 1)
     train_df=train_df.drop('Name',axis = 1)
     test_df=test_df.drop('Name', axis = 1)
     combine=[train_df,test_df]
@@ -74,6 +77,7 @@ def func3():
     test_df['Sex'] = test_df['Sex'].map(mapping).astype(int)
     combine=[train_df,test_df]
 
+# LEAF
    
 def func4():
     '''func4: fill NaN for age with median for both train and test data  and divide age into 5 categories 0-4, with 16-year increment'''
