@@ -58,7 +58,7 @@ def func2():
     global train_df
     global test_df
     global combine
-    #For test_df, don not drop PassengerId yet.
+    #For test_df, do not drop PassengerId yet.
     train_df=train_df.drop('PassengerId',axis = 1)
     #test_df=test_df.drop('PassengerId', axis = 1)
     train_df=train_df.drop('Name',axis = 1)
@@ -94,6 +94,7 @@ def func4():
         i.loc[(i['Age'] > 48) & (i['Age'] <= 64),'Age'] = 3
         i.loc[(i['Age'] > 64),'Age'] = 4
 
+# LEAF B
 
 def func5():
     '''Create FamilySize from SibSp and Parch then create IsAlone'''
