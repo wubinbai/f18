@@ -1,3 +1,41 @@
+"""
+Groupby technique
+train_df[['Pclass','Survived']].groupby(['Pclass'],as_index=True).mean().sort_values(by='Survived',ascending=False)
+
+You can do this with Sex, SibSp, Parch.
+
+Visualization:
+g=sns.FacetGrid(train_df_copy,col='Survived')
+g.map(plt.hist,'Age',bins=20)
+
+grid=sns.FacetGrid(train_df_copy,col='Survived',row='Pclass')
+grid.map(plt.hist,'Age',alpha=.5,bins=20)
+
+grid2=sns.FacetGrid(train_df_copy,row='Embarked',height=2.2,aspect=1.6)
+grid2.map(sns.pointplot,'Pclass','Survived','Sex',palette='deep')
+GRID2.ADD_LEGEND()
+
+grid3=sns.FacetGrid(train_df_copy,row='Embarked',col='Survived',height=2.2,aspect=1.6)
+grid3.map(sns.barplot,'Sex','Fare',alpha=.5,ci=None)
+
+
+ccombo2=[train_df_copy,test_df_copy]
+for i in combo2:
+     i['Title'] = i.Name.str.extract('([A-Za-z]+)\.',expand=False)
+
+pd.crosstab(train_df_copy.Title,train_df_copy.Sex)
+
+
+
+
+"""
+
+
+
+
+
+
+
 import pandas as pd
 import numpy as np
 import random as rnd
