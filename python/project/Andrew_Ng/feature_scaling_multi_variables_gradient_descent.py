@@ -4,7 +4,7 @@ import numpy as np
 # Assuming y = 0 + 10 * x1 + 20*x2
 # So theta0 = 0, theta1 = 10, theta2 = 20
 x1=[1,2,3,4,5]
-x2=[2000,4000,6000,8000,10000]
+x2=[10000,11000,12000,13000,14000]
 
 x1=[i/max(x1) for i in x1]
 x2=[i/max(x2) for i in x2]
