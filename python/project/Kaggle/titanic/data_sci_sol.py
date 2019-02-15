@@ -1,3 +1,4 @@
+
 """
 Groupby technique
 train_df[['Pclass','Survived']].groupby(['Pclass'],as_index=True).mean().sort_values(by='Survived',ascending=False)
@@ -25,7 +26,13 @@ for i in combo2:
 
 pd.crosstab(train_df_copy.Title,train_df_copy.Sex)
 
+grid4 = sns.FacetGrid(train_df_copy,row='Pclass',col='Sex',size=2.2,aspect=1.6)
+grid4.map(plt.hist,'Age',alpha=.5,bins=20) 
 
+train_df_copy['AgeBand']=pd.cut(train_df_copy['Age'],5) 
+
+train_df_copy[['AgeBand','Survived']].groupby(['AgeBand'],as
+    ...: _index=False).mean() 
 
 
 """
