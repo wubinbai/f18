@@ -1,3 +1,4 @@
+import matplotlib
 from sklearn.datasets import load_digits
 digits = load_digits()
 X = digits.data
