@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # **Chapter 4 – Training Linear Models**
@@ -23,7 +23,7 @@ import os
 np.random.seed(42)
 
 # To plot pretty figures
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib
 import matplotlib.pyplot as plt
 plt.rcParams['axes.labelsize'] = 14
@@ -670,7 +670,7 @@ best_epoch, best_model
 # In[48]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -1267,3 +1267,9 @@ accuracy_score
 
 
 # Our perfect model turns out to have slight imperfections. This variability is likely due to the very small size of the dataset: depending on how you sample the training set, validation set and the test set, you can get quite different results. Try changing the random seed and running the code again a few times, you will see that the results will vary.
+
+# In[ ]:
+
+
+
+

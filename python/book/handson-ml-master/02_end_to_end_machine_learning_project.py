@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # **Chapter 2 – End-to-end Machine Learning project**
@@ -27,7 +27,7 @@ import os
 np.random.seed(42)
 
 # To plot pretty figures
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib
 import matplotlib.pyplot as plt
 plt.rcParams['axes.labelsize'] = 14
@@ -118,7 +118,7 @@ housing.describe()
 # In[9]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib.pyplot as plt
 housing.hist(bins=50, figsize=(20,15))
 save_fig("attribute_histogram_plots")

@@ -1,3 +1,3 @@
 #! /bin/bash
 
-ipython nbconvert *.ipynb --to python
+ipython3 nbconvert *.ipynb --to python

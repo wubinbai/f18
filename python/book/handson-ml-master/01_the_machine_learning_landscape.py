@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # **Chapter 1 – The Machine Learning landscape**
@@ -23,7 +23,7 @@ import os
 np.random.seed(42)
 
 # To plot pretty figures
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib
 import matplotlib.pyplot as plt
 plt.rcParams['axes.labelsize'] = 14
@@ -110,7 +110,43 @@ X_new = [[22587]]  # Cyprus' GDP per capita
 print(model.predict(X_new)) # outputs [[ 5.96242338]]
 
 
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
 # # Note: you can ignore the rest of this notebook, it just generates many of the figures in chapter 1.
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
 
 # # Load and prepare Life satisfaction data
 
@@ -491,4 +527,10 @@ model.fit(X, y)
 # Make a prediction for Cyprus
 X_new = np.array([[22587.0]])  # Cyprus' GDP per capita
 print(model.predict(X_new)) # outputs [[ 5.76666667]]
+
+
+# In[ ]:
+
+
+
 

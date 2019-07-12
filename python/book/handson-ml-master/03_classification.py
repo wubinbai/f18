@@ -23,7 +23,7 @@ import os
 np.random.seed(42)
 
 # To plot pretty figures
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib
 import matplotlib.pyplot as plt
 plt.rcParams['axes.labelsize'] = 14
@@ -74,7 +74,7 @@ y.shape
 # In[6]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().magic('matplotlib inline')
 import matplotlib
 import matplotlib.pyplot as plt
 
