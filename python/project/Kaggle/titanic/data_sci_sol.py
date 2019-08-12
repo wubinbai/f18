@@ -208,8 +208,10 @@ func8()
 # overall:
 X_train = train_df.drop("Survived", axis = 1)
 y_train = train_df["Survived"]
-X_test = test_df
+X_test = test_df.drop("PassengerId", axis = 1)
 # ML models: LR, SVM, kNN, GNB, Perceptron, Linear SVC, SGD, DT, RF
+
+
 
 # 1 LR
 logreg = LogisticRegression()
@@ -219,6 +221,10 @@ acc_log = round(logreg.score(X_train, y_train)*100,2)
 y_pred_lr = y_pred
 sub_lr = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_lr})
 sub_lr.to_csv('sub_lr.csv', index = False)
+
+from sklearn.model_selection import cross_val_score as crvs
+logreg_score = crvs(logreg,X_train,y_train,cv=100,scoring='accuracy')
+
 
 
 
@@ -303,6 +309,9 @@ acc_rf = round(rf.score(X_train, y_train)*100,2)
 y_pred_rf = y_pred
 sub_rf = pd.DataFrame({"PassengerId":PassengerId_Series,"Survived":y_pred_rf})
 sub_rf.to_csv('sub_rf.csv', index = False)
+
+rf_score = crvs(rf,X_train,y_train,cv=100,scoring='accuracy')
+
 
 
 
