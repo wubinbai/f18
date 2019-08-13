@@ -1,0 +1,6 @@
+classifier,public_score,rank,local_accuracy
+all_died,0.62679,11073,0.61616
+male_died,0.76555,8342,0.78675
+
+
+
