@@ -1,6 +1,17 @@
 classifier,public_score,rank,local_accuracy
 all_died,0.62679,11073,0.61616
 male_died,0.76555,8342,0.78675
-
-
-
+dt_sex_pclass,0.75598,worse,none
+rf_sex_pclass,0.75598,worse,none
+dt_sex_pclass_sibsp,0.76076,worse,none
+dt_sex_pclass_sibsp_parch,0.75598
+rf_parch_sibsp_pclass_sex,0.76555
+dt_embarked_sex_pclass_sibsp_parch,0.72727
+dt_cabin+previous, 0.73205
+dt_cabin+previous_max_depth=5,0.76076
+                  max_depth=4,0.76076
+                  max_depth=3,0.76076
+                  max_depth=6,0.75119
+dt_cabin+previous,max_depth=5,min_samples_spli
+t=4,min_samples_leaf=2, 0.74641
+grid+previous, 0.76076
